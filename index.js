@@ -4,6 +4,7 @@ import { MongoClient, ObjectId } from 'mongodb';
 import dotenv from 'dotenv';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
+import { assignLocker } from './controllers/lockerController.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -382,6 +383,40 @@ app.get('/api/store-managers/:id', async (req, res) => {
   } catch (error) {
     console.error('Error fetching store manager:', error);
     res.status(500).json({ error: '매장 관리자 조회 중 오류가 발생했습니다.' });
+  }
+});
+
+// ========== Lockers API ==========
+// 락커 배정
+app.post('/api/lockers/assign', async (req, res) => {
+  try {
+    const { seatBlock, userId } = req.body;
+    
+    // 입력 검증
+    if (!seatBlock || !userId) {
+      return res.status(400).json({ error: 'seatBlock과 userId는 필수 입력 항목입니다.' });
+    }
+    
+    // 락커 배정
+    const assignedLocker = await assignLocker(db, client, seatBlock, userId);
+    
+    res.json({
+      success: true,
+      data: assignedLocker
+    });
+  } catch (error) {
+    console.error('Error assigning locker:', error);
+    
+    // 에러 메시지에 따라 적절한 상태 코드 반환
+    if (error.message.includes('유효하지 않은 블록 번호') || error.message.includes('사용 가능한 락커가 없습니다')) {
+      return res.status(404).json({ error: error.message });
+    }
+    
+    if (error.message.includes('이미 다른 사용자에게 할당')) {
+      return res.status(409).json({ error: error.message });
+    }
+    
+    res.status(500).json({ error: '락커 배정 중 오류가 발생했습니다.' });
   }
 });
 

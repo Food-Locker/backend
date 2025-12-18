@@ -8,23 +8,6 @@
 - Express.js
 - MongoDB
 
-## 설치 및 실행
-
-```bash
-# 의존성 설치
-npm install
-
-# 환경 변수 설정
-cp .env.example .env
-# .env 파일을 열어서 MONGODB_URI를 설정하세요
-
-# 데이터베이스 시드 (초기 데이터 생성)
-npm run seed
-
-# 서버 실행
-npm start
-```
-
 서버는 기본적으로 `http://localhost:3001`에서 실행됩니다.
 
 ## 환경 변수
