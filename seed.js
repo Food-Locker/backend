@@ -28,6 +28,7 @@ async function seedDatabase() {
     await db.collection('categories').deleteMany({});
     await db.collection('brands').deleteMany({});
     await db.collection('items').deleteMany({});
+    await db.collection('lockers').deleteMany({});
     console.log('기존 데이터 삭제 완료');
 
     // 1. Stadiums 생성
@@ -573,17 +574,61 @@ async function seedDatabase() {
 
     console.log('✅ 부산 사직야구장 데이터 생성 완료');
 
+    // Lockers 생성
+    const lockersData = [];
+    
+    // Zone_A (1루 내야): 10개 락커
+    for (let i = 1; i <= 10; i++) {
+      lockersData.push({
+        lockerId: `A-${String(i).padStart(2, '0')}`,
+        zone: 'Zone_A',
+        location: '1루 입구',
+        status: 'available',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      });
+    }
+    
+    // Zone_B (3루 내야): 10개 락커
+    for (let i = 1; i <= 10; i++) {
+      lockersData.push({
+        lockerId: `B-${String(i).padStart(2, '0')}`,
+        zone: 'Zone_B',
+        location: '3루 입구',
+        status: 'available',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      });
+    }
+    
+    // Zone_C (외야): 20개 락커
+    for (let i = 1; i <= 20; i++) {
+      lockersData.push({
+        lockerId: `C-${String(i).padStart(2, '0')}`,
+        zone: 'Zone_C',
+        location: '외야 입구',
+        status: 'available',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      });
+    }
+    
+    await db.collection('lockers').insertMany(lockersData);
+    console.log(`✅ ${lockersData.length}개의 Lockers 생성 완료 (Zone_A: 10개, Zone_B: 10개, Zone_C: 20개)`);
+
     // 통계 출력
     const stadiumsCount = await db.collection('stadiums').countDocuments();
     const categoriesCount = await db.collection('categories').countDocuments();
     const brandsCount = await db.collection('brands').countDocuments();
     const itemsCount = await db.collection('items').countDocuments();
+    const lockersCount = await db.collection('lockers').countDocuments();
 
     console.log('\n📊 데이터베이스 시드 완료 통계:');
     console.log(`- Stadiums: ${stadiumsCount}개`);
     console.log(`- Categories: ${categoriesCount}개`);
     console.log(`- Brands: ${brandsCount}개`);
     console.log(`- Items: ${itemsCount}개`);
+    console.log(`- Lockers: ${lockersCount}개`);
     console.log('\n✅ 모든 데이터베이스 시드 완료!');
     console.log('\n💡 매장 관리자 계정을 생성하려면 store 프로젝트의 seed.js를 실행하세요.');
   } catch (error) {
